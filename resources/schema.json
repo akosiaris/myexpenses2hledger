@@ -1,0 +1,190 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Schema for My Expenses JSON exports",
+    "oneOf": [
+        {
+            "$ref": "#/$defs/account"
+        },
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/account"
+            },
+            "minItems": 2
+        }
+    ],
+    "$defs": {
+        "account": {
+            "type": "object",
+            "properties": {
+                "currency": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "openingBalance": {
+                    "type": "number"
+                },
+                "transactions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/transaction"
+                    },
+                    "minItems": 1
+                },
+                "uuid": {
+                    "type": "string",
+                    "format": "uuid"
+                }
+            },
+            "required": [
+                "label",
+                "openingBalance",
+                "transactions",
+                "uuid"
+            ]
+        },
+        "transaction": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "category": {
+                    "description": "Complete category tree for this transaction where each array item represents one segment of the category tree",
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "minItems": 1
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "methodLabel": {
+                    "type": "string"
+                },
+                "payee": {
+                    "type": "string"
+                },
+                "attachments": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "referenceNumber": {
+                    "type": "string"
+                },
+                "splits": {
+                    "type": "array",
+                    "items": {
+                        "allOf": [
+                            {
+                                "$ref": "#/$defs/transaction"
+                            },
+                            {
+                                "not": {
+                                    "type": "object",
+                                    "required": [
+                                        "splits"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "minItems": 1
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "UNRECONCILED",
+                        "CLEARED",
+                        "RECONCILED",
+                        "VOID"
+                    ]
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "transferAccount": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string",
+                    "oneOf": [
+                        {
+                            "format": "uuid"
+                        },
+                        {
+                            "maxLength": 0
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "amount",
+                "date",
+                "uuid"
+            ],
+            "dependencies": {
+                "category": {
+                    "not": {
+                        "anyOf": [
+                            {
+                                "required": [
+                                    "splits"
+                                ]
+                            },
+                            {
+                                "required": [
+                                    "transferAccount"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "splits": {
+                    "not": {
+                        "anyOf": [
+                            {
+                                "required": [
+                                    "category"
+                                ]
+                            },
+                            {
+                                "required": [
+                                    "transferAccount"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "transferAccount": {
+                    "not": {
+                        "anyOf": [
+                            {
+                                "required": [
+                                    "category"
+                                ]
+                            },
+                            {
+                                "required": [
+                                    "splits"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
