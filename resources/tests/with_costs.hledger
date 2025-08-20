@@ -1,0 +1,4 @@
+2024-01-15 buy some shares, in two lots                 ; Cost can be noted.
+    assets:investments:2024-01-15     2.0 AAAA @ $1.50  ; @  means per-unit cost
+    assets:investments:2024-01-15-02  3.0 AAAA @@ $4    ; @@ means total cost
+    assets:checking                 $-7
