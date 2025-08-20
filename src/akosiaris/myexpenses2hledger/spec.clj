@@ -42,7 +42,7 @@
 (s/def ::payee string?)
 (s/def ::status #{"*" "!" ""}) ; Cleared, pending, unmarked
 (s/def ::code string?)
-(s/def ::date string?) ;; TODO: Fix this
+(s/def ::date jt/local-date?)
 (s/def ::postings (s/coll-of ::posting :into []))
 (s/def ::transaction (s/keys :req-un [::date
                                       ::payee]
