@@ -21,6 +21,10 @@
   "Check if a tag name matches the proper syntax"
   [name]
   (re-matches tag-re name))
+(defn balanced-postings?
+  "Check if a collection of postings is balanced"
+  [postings]
+  (= 0M (reduce + (map :amount postings))))
 
 ;; Building blocks
 (s/def ::amount decimal?)
@@ -43,7 +47,10 @@
 (s/def ::status #{"*" "!" ""}) ; Cleared, pending, unmarked
 (s/def ::code string?)
 (s/def ::date jt/local-date?)
-(s/def ::postings (s/coll-of ::posting :into []))
+(s/def ::postings (s/and (s/coll-of ::posting
+                                    :kind vector
+                                    :min-count 2)
+                         balanced-postings?))
 (s/def ::transaction (s/keys :req-un [::date
                                       ::payee]
                              :opt-un [::status
