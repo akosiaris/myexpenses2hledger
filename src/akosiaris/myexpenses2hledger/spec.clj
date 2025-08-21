@@ -31,6 +31,7 @@
 (s/def ::account (s/and string? account?))
 (s/def ::commodity (s/and string? commodity?))
 (s/def ::tag (s/and string? tag?))
+(s/def ::comment string?)
 
 ;; posting stuff
 (s/def ::cost decimal?)
@@ -39,6 +40,8 @@
                                   ::commodity
                                   ]
                          :opt-un [::cost
+                                  ::status
+                                  ::comment
                                   ::tag]))
 
 ;; transaction stuff
