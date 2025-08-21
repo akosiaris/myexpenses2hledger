@@ -55,9 +55,10 @@
                                     :min-count 2)
                          balanced-postings?))
 (s/def ::transaction (s/keys :req-un [::date
-                                      ::payee]
-                             :opt-un [::status
-                                      ::code
+                                      ::payee
+                                      ::status]
+                             :opt-un [::code
                                       ::note
+                                      ::comment
                                       ::tag
                                       ::postings]))
