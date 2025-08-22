@@ -1,6 +1,7 @@
 (ns akosiaris.myexpenses2hledger.formatter-test
   (:require [clojure.test :refer [deftest testing is]]
             [java-time.api :as jt]
+            [clojure.java.io :refer [resource]]
             [akosiaris.myexpenses2hledger.formatter :as f]))
 
 (deftest proper-transaction-headers
@@ -66,3 +67,17 @@
               :status "!"
               :postings [p1, p2]}]
       (is (= "2025-08-20 ! Pending\n    expenses  1 EUR\n    assets  -1 $" (f/format-transaction t1))))))
+
+(deftest against-fixture-transactions
+  (testing "single-transaction"
+    (let [p1 {:account "assets:bank:checking" :amount 1M :commodity "EUR"}
+          p2 {:account "income:salary" :amount -1M :commodity "EUR"}
+          t1 {:date (jt/local-date "2008-01-01")
+              :payee "income"
+              :status ""
+              :postings [p1, p2]}
+          fixture (-> "tests/single_transation.hledger"
+                resource
+                slurp)]
+      (is (= fixture (f/format-transaction t1))))))
+  
