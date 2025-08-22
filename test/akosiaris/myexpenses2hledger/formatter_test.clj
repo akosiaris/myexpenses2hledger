@@ -113,4 +113,49 @@
           fixture (-> "tests/cleared_transaction.hledger"
                       resource
                       slurp)]
+      (is (= fixture (f/format-transaction t1)))))
+  (testing "a-note"
+    (let [t1 {:date (jt/local-date "2024-02-01")
+              :payee "note some event"
+              :status ""}
+          fixture (-> "tests/a_note.hledger"
+                      resource
+                      slurp)]
+      (is (= fixture (f/format-transaction t1)))))
+  (testing "with-code"
+    (let [p1 {:account "assets:checking" :amount -500M :commodity "$"}
+          p2 {:account "expenses:rent" :amount 500M :commodity "$"}
+          t1 {:date (jt/local-date "2024-01-03")
+              :payee "pay rent"
+              :status "!"
+              :code "12345"
+              :postings [p1, p2]}
+          fixture (-> "tests/transaction_with_code.hledger"
+                      resource
+                      slurp)]
+      (is (= fixture (f/format-transaction t1)))))
+  (testing "with-a-note"
+    (let [p1 {:account "assets:bank:gold" :amount -10M :commodity "gold"}
+          p2 {:account "assets:pouch" :amount 10M :commodity "gold"}
+          t1 {:date (jt/local-date "2024-01-02")
+              :payee "Gringott's Bank"
+              :status ""
+              :note "withdrawal"
+              :postings [p1, p2]}
+          fixture (-> "tests/transaction_with_a_note.hledger"
+                      resource
+                      slurp)]
+      (is (= fixture (f/format-transaction t1)))))
+  (testing "with-costs"
+    (let [p1 {:account "assets:investments:2024-01-15" :amount 2.0M :commodity "AAAA"}
+          p2 {:account "assets:investments:2024-01-15-02" :amount 3.0M :commodity "AAAA"}
+          p3 {:account "assets:checking" :amount -7M :commodity "USD"}
+          t1 {:date (jt/local-date "2024-01-15")
+              :payee "buy some shares, in two lots"
+              :status ""
+              :comment "Cost can be noted."
+              :postings [p1, p2, p3]}
+          fixture (-> "tests/with_costs.hledger"
+                      resource
+                      slurp)]
       (is (= fixture (f/format-transaction t1))))))

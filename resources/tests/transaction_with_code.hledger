@@ -1,0 +1,3 @@
+2024-01-03 ! (12345) pay rent
+    assets:checking  -500 $
+    expenses:rent     500 $
