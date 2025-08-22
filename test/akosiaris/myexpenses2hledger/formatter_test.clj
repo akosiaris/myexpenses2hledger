@@ -134,6 +134,30 @@
                       resource
                       slurp)]
       (is (= fixture (f/format-transaction t1)))))
+  (testing "with-comment"
+    (let [p1 {:account "assets:checking" :amount -500M :commodity "$"}
+          p2 {:account "expenses:equipment" :amount 500M :commodity "$"}
+          t1 {:date (jt/local-date "2024-01-03")
+              :payee "e-corp"
+              :status ""
+              :comment "Domo arigato Mr. Roboto"
+              :postings [p1, p2]}
+          fixture (-> "tests/transaction_with_comment.hledger"
+                      resource
+                      slurp)]
+      (is (= fixture (f/format-transaction t1)))))
+  (testing "with-tag"
+    (let [p1 {:account "assets:checking" :amount -50M :commodity "€"}
+          p2 {:account "expenses:food" :amount 50M :commodity "€"}
+          t1 {:date (jt/local-date "2024-01-03")
+              :payee "Artie's Deli"
+              :status ""
+              :tag "worktrips:"
+              :postings [p1, p2]}
+          fixture (-> "tests/transaction_with_tag.hledger"
+                      resource
+                      slurp)]
+      (is (= fixture (f/format-transaction t1)))))
   (testing "with-a-note"
     (let [p1 {:account "assets:bank:gold" :amount -10M :commodity "gold"}
           p2 {:account "assets:pouch" :amount 10M :commodity "gold"}
