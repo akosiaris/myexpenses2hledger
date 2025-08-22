@@ -91,4 +91,26 @@
           fixture (-> "tests/multiple_postings.hledger"
                       resource
                       slurp)]
+      (is (= fixture (f/format-transaction t1)))))
+  (testing "pending-transaction"
+    (let [p1 {:account "expenses:supplies" :amount 1M :commodity "$"}
+          p2 {:account "assets:cash" :amount -1M :commodity "$"}
+          t1 {:date (jt/local-date "2008-06-03")
+              :payee "foo & bar"
+              :status "!"
+              :postings [p1, p2]}
+          fixture (-> "tests/pending_transaction.hledger"
+                      resource
+                      slurp)]
+      (is (= fixture (f/format-transaction t1)))))
+  (testing "cleared-transaction"
+    (let [p1 {:account "expenses:food" :amount 1M :commodity "$"}
+          p2 {:account "assets:cash" :amount -1M :commodity "$"}
+          t1 {:date (jt/local-date "2008-06-03")
+              :payee "eat & shop"
+              :status "*"
+              :postings [p1, p2]}
+          fixture (-> "tests/cleared_transaction.hledger"
+                      resource
+                      slurp)]
       (is (= fixture (f/format-transaction t1))))))
