@@ -42,10 +42,10 @@
   {:pre [(s/valid? ::spec/transaction transaction)]}
   (let [ffs [[:date, #(jt/format date-format %)]
              [:status, identity]
-             [:code, #(if % (format "(%s)" %) (identity %))]
+             [:code, #(if % (format "(%s)" %) %)]
              [:payee, identity]
-             [:note, #(if % (format "| %s" %) (identity %))]
-             [:comment, #(if % (format " ; %s" %) (identity %))] ; TODO: solve this for proper alignment
+             [:note, #(if % (format "| %s" %) %)]
+             [:comment, #(if % (format " ; %s" %) %)] ; TODO: solve this for proper alignment
              [:tag, identity]] ; TODO: solve this for proper alignment
         r (mapv #((second %) (get transaction (first %))) ffs)]
     (reduce #(if (blank? %2) %1 (str %1 " " %2)) r)))
