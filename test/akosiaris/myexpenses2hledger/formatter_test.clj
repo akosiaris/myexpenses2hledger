@@ -66,7 +66,7 @@
               :payee "Pending"
               :status "!"
               :postings [p1, p2]}]
-      (is (= "2025-08-20 ! Pending\n    expenses  1 EUR\n    assets  -1 $" (f/format-transaction t1))))))
+      (is (= "2025-08-20 ! Pending\n    expenses   1 EUR\n    assets    -1 $" (f/format-transaction t1))))))
 
 (deftest against-fixture-transactions
   (testing "single-transaction"
@@ -77,7 +77,18 @@
               :status ""
               :postings [p1, p2]}
           fixture (-> "tests/single_transation.hledger"
-                resource
-                slurp)]
+                      resource
+                      slurp)]
+      (is (= fixture (f/format-transaction t1)))))
+  (testing "multiple-postings"
+    (let [p1 {:account "expenses:food" :amount 90M :commodity "USD"}
+          p2 {:account "expenses:supplies" :amount 11M :commodity "USD"}
+          p3 {:account "assets:cash" :amount -101M :commodity "USD"}
+          t1 {:date (jt/local-date "2008-06-03")
+              :payee "eat & shop"
+              :status "*"
+              :postings [p1, p2, p3]}
+          fixture (-> "tests/multiple_postings.hledger"
+                      resource
+                      slurp)]
       (is (= fixture (f/format-transaction t1))))))
-  

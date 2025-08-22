@@ -1,4 +1,4 @@
-2008/06/03 * eat & shop
-    expenses:food      $1
-    expenses:supplies  $1
-    assets:cash
+2008-06-03 * eat & shop
+    expenses:food        90 USD
+    expenses:supplies    11 USD
+    assets:cash        -101 USD
