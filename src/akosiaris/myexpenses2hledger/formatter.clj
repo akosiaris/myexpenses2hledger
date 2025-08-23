@@ -40,14 +40,17 @@
   "Formats the transaction header, that is date, payee, status, code, comment, tag"
   [transaction]
   {:pre [(s/valid? ::spec/transaction transaction)]}
-  (let [ffs [[:date, #(jt/format date-format %)]
+  (let [ctag (if (or (:comment transaction) (:tag transaction)) true false)
+        t (assoc transaction :ctag ctag)
+        ffs [[:date, #(jt/format date-format %)]
              [:status, identity]
              [:code, #(if % (format "(%s)" %) %)]
              [:payee, identity]
              [:note, #(if % (format "| %s" %) %)]
-             [:comment, #(if % (format " ; %s" %) %)] ; TODO: solve this for proper alignment
+             [:ctag, #(if % " ;" "")]
+             [:comment, identity] ; TODO: solve this for proper alignment
              [:tag, identity]] ; TODO: solve this for proper alignment
-        r (mapv #((second %) (get transaction (first %))) ffs)]
+        r (mapv #((second %) (get t (first %))) ffs)]
     (reduce #(if (blank? %2) %1 (str %1 " " %2)) r)))
 
 (defn format-transaction
