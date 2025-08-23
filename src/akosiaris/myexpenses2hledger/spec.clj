@@ -4,7 +4,7 @@
 
 ;; Some useful defs
 ;; An account name can support hierarchies via the : sign.
-(def account-re #"^([\w-]+ ?)+(:?[\w-]+ ?)*$")
+(def account-re #"^([\p{L}-]+ ?)+(:?[\p{L}-]+ ?)*$")
 (defn account?
   "Check if an account name matches the proper syntax"
   [name]
