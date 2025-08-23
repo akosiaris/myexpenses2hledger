@@ -16,7 +16,7 @@
   [name]
   (re-matches commodity-re name))
 ;; A tag should have no whitespace and end with a :
-(def tag-re #"^[\w-]+:$")
+(def tag-re #"^[\p{L}-]+:$")
 (defn tag?
   "Check if a tag name matches the proper syntax"
   [name]

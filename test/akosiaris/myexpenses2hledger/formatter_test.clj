@@ -47,7 +47,11 @@
       (is (= "    expenses  1 EUR @ 1.5" (f/format-posting p1)))))
   (testing "With a comment"
     (let [p1 {:account "expenses" :amount 1M :commodity "EUR" :comment "A comment"}]
-      (is (= "    expenses  1 EUR  ; A comment" (f/format-posting p1))))))
+      (is (= "    expenses  1 EUR  ; A comment" (f/format-posting p1)))))
+  (testing "With Unicode in the name"
+    (let [p1 {:account "Έξοδα-你" :amount 1M :commodity "EUR" :comment "A comment"}]
+      (is (= "    Έξοδα-你  1 EUR  ; A comment" (f/format-posting p1))))))
+
 
 (deftest proper-transactions
   (testing "Bare minimum transactions"
