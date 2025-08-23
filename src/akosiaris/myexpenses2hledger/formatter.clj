@@ -66,9 +66,9 @@
                                         str
                                         (clojure.string/split #"\.")
                                         first))
-                                    postings)
+                            postings)
         acmlength (if (empty? account_lengths) 0 (apply max account_lengths))
         ammlength (if (empty? amount_lengths) 0 (apply max amount_lengths))
         fpostings (mapv #(format-posting acmlength ammlength %) postings)
-        lines (if (empty? fpostings) [header] (cons header fpostings))]
+        lines (concat [header] fpostings)]
     (clojure.string/join "\n" lines)))
