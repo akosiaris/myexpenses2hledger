@@ -1,7 +1,7 @@
 (ns akosiaris.myexpenses2hledger.importer
   (:require [clojure.data.json :as json]
             [java-time.api :as jt]
-            [clojure.string :refer [join replace]]
+            [clojure.string :refer [join replace] :rename {replace str-replace}]
             [clojure.spec.alpha :as s]
             [akosiaris.myexpenses2hledger.spec :as spec]))
 
@@ -27,7 +27,7 @@
     ;; Switch account to hledger syntax
     (= k :account) (join ":" v)
     ;; Switch tags to the hledger syntax
-    (= k :tags) (mapv #(format "%s:" (replace % " " "-")) v)
+    (= k :tags) (mapv #(format "%s:" (str-replace % " " "-")) v)
     ;; Delete methodLabel
     (= k :methodLabel) transform-json-values
     ;; Force Decimal for accuracy, flip the sign since MyExpenses has a negative sign for all expenses
