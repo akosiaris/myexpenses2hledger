@@ -1,35 +1,58 @@
 (ns akosiaris.myexpenses2hledger.formatter
   (:require [akosiaris.myexpenses2hledger.spec :as spec]
             [clojure.spec.alpha :as s]
-            [clojure.string :refer [blank?]]
+            [clojure.string :refer [blank? split]]
             [java-time.api :as jt]))
 
 (def date-format :iso-local-date)
 
+(defn amount-integer-part
+  "Turns amount into a string, cuts out the dot and the decimals, keeping only the integer part. Useful for alignments"
+  [amount]
+  (-> amount
+      str
+      (split #"\.")
+      first
+      count))
+
+(defn transaction-max-lengths
+  "Return a map containing a transaction's max amount and account length across all postings"
+  [transaction]
+  (let [postings (:postings transaction)
+        accounts (map :account postings)
+        amounts (map :amount postings)
+        ;; Use a 0 in a vector for the default return
+        max-account-length (apply max (concat [0] (map count accounts)))
+        ;; We wanna align on the last integer of the longest amount, so calculate length of that
+        max-integer-amount-length (apply max (concat [0] (map amount-integer-part amounts)))]
+    {:max-account-length max-account-length
+     :max-integer-amount-length max-integer-amount-length}))
+
 (defn- pad-account
-  "Calculates the amount of required padding"
-  [mlength account]
-  (let [padding-length (- mlength (count account))
-        padding (apply str (repeat padding-length " "))]
+  "Right pads account up to max-length"
+  [max-length account]
+  (let [pad-length (- max-length (count account))
+        padding (apply str (repeat pad-length " "))]
     (format "%s%s" account padding)))
 
 (defn- pad-amount
-  "Pads amount with the proper spaces depending on the sign"
-  [amlength amount]
-  (let [leftpad (- amlength (count (str amount)))]
-    (format " %s%s" (apply str (repeat leftpad " ")) amount)))
+  "Left pads amount up to max-length"
+  [max-length amount]
+  (let [pad-length (- max-length (amount-integer-part amount))]
+    (format " %s%s" (apply str (repeat pad-length " ")) amount)))
+
 
 (defn format-posting
   "Formats a transaction's posting in the hledger syntax"
   ([posting]
-   (format-posting 0 1 posting))
-  ([acmlength amlength posting]
+   (format-posting 0 0 posting))
+  ([max-account-length max-integer-amount-length posting]
    {:pre [(s/valid? ::spec/posting posting)]}
    (let [ffs [[:status, identity]
-              [:account, #(pad-account acmlength %)]
-              [:amount, #(pad-amount amlength %)]
+              [:account, #(pad-account max-account-length %)]
+              [:amount, #(pad-amount max-integer-amount-length %)]
               [:commodity, #(if (re-matches #" " %) (format "\"%s\"" %) (identity %))] ; TODO: solve this for proper alignment
-             ; TODO: This needs more work to reflect both unit price and total price as well as cost commodity
+              ; TODO: This needs more work to reflect both unit price and total price as well as cost commodity
               [:cost, #(if % (format "@ %s" %) (identity %))] ; TODO: solve this for proper alignment
               [:comment, #(if % (format " ; %s" %) (identity %))] ; TODO: solve this for proper alignment
               [:tag, identity]] ; TODO: solve this for proper alignment
@@ -55,20 +78,14 @@
 
 (defn format-transaction
   "Formats a transaction in the hledger format"
-  [transaction]
-  {:pre [(s/valid? ::spec/transaction transaction)]}
-  (let [header (format-transaction-header transaction)
-        postings (:postings transaction)
-        account_lengths (map #(count (:account %)) postings)
-        ;; We deploy a small trick here. We want to align on the last non decimal digit.
-        ;; So we make it a string and only keep the non-decimal part
-        amount_lengths (map #(count (-> (:amount %)
-                                        str
-                                        (clojure.string/split #"\.")
-                                        first))
-                            postings)
-        acmlength (if (empty? account_lengths) 0 (apply max account_lengths))
-        ammlength (if (empty? amount_lengths) 0 (apply max amount_lengths))
-        fpostings (mapv #(format-posting acmlength ammlength %) postings)
-        lines (concat [header] fpostings)]
-    (clojure.string/join "\n" lines)))
+  ([transaction]
+   (let [{max-account-length :max-account-length
+          max-integer-amount-length :max-integer-amount-length} (transaction-max-lengths transaction)]
+     (format-transaction transaction max-account-length max-integer-amount-length)))
+  ([transaction max-account-length max-integer-amount-length]
+   {:pre [(s/valid? ::spec/transaction transaction)]}
+   (let [header (format-transaction-header transaction)
+         postings (:postings transaction)
+         fpostings (mapv #(format-posting max-account-length max-integer-amount-length %) postings)
+         lines (concat [header] fpostings)]
+     (clojure.string/join "\n" lines))))

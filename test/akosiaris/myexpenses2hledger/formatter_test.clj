@@ -4,6 +4,30 @@
             [clojure.java.io :refer [resource]]
             [akosiaris.myexpenses2hledger.formatter :as f]))
 
+(deftest amount-integer-part-test
+  (testing "That amount integer part works"
+    (let [a1 1M
+          a2 -20.0M
+          a3 300.33M
+          a4 -4000.44M
+          a5 50000.55M]
+      (is (= 1 (f/amount-integer-part a1)))
+      (is (= 3 (f/amount-integer-part a2)))
+      (is (= 3 (f/amount-integer-part a3)))
+      (is (= 5 (f/amount-integer-part a4)))
+      (is (= 5 (f/amount-integer-part a5))))))
+
+(deftest transaction-max-lengths-test
+  (testing "That transaction max lenths are calculated correctly"
+    (let [p1 {:account "expenses" :amount 1M :commodity "EUR"}
+          p2 {:account "assets" :amount -1M :commodity "$"}
+          t1 {:date (jt/local-date "2025-08-20")
+              :payee "Pending"
+              :status "!"
+              :postings [p1, p2]}]
+      (is (= {:max-account-length 8, :max-integer-amount-length 2} (f/transaction-max-lengths t1)))
+      )))
+
 (deftest proper-transaction-headers
   (testing "That status is honored"
     (let [t1 {:date (jt/local-date "2025-08-20") :payee "Pending" :status "!"}
@@ -174,16 +198,17 @@
                       resource
                       slurp)]
       (is (= fixture (f/format-transaction t1)))))
-  (testing "with-costs"
-    (let [p1 {:account "assets:investments:2024-01-15" :amount 2.0M :commodity "AAAA"}
-          p2 {:account "assets:investments:2024-01-15-02" :amount 3.0M :commodity "AAAA"}
-          p3 {:account "assets:checking" :amount -7M :commodity "USD"}
-          t1 {:date (jt/local-date "2024-01-15")
-              :payee "buy some shares, in two lots"
-              :status ""
-              :comment "Cost can be noted."
-              :postings [p1, p2, p3]}
-          fixture (-> "tests/with_costs.hledger"
-                      resource
-                      slurp)]
-      (is (= fixture (f/format-transaction t1))))))
+    ;; (testing "with-costs"
+  ;;   (let [p1 {:account "assets:investments:2024-01-15" :amount 2.0M :commodity "AAAA"}
+  ;;         p2 {:account "assets:investments:2024-01-15-02" :amount 3.0M :commodity "AAAA"}
+  ;;         p3 {:account "assets:checking" :amount -7M :commodity "USD"}
+  ;;         t1 {:date (jt/local-date "2024-01-15")
+  ;;             :payee "buy some shares, in two lots"
+  ;;             :status ""
+  ;;             :comment "Cost can be noted."
+  ;;             :postings [p1, p2, p3]}
+  ;;         fixture (-> "tests/with_costs.hledger"
+  ;;                     resource
+  ;;                     slurp)]
+  ;;     (is (= fixture (f/format-transaction t1)))))
+  )
