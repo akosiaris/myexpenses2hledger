@@ -1,0 +1,87 @@
+{
+  "uuid": "79af7e4a-20b5-4903-86d3-a0e4d22de905",
+  "label": "ExportingAccount",
+  "currency": "EUR",
+  "openingBalance": 1,
+  "transactions": [
+    {
+      "amount": 10,
+      "category": [
+        "Gifts"
+      ],
+      "comment": "Gift for Alice",
+      "date": "2025-08-22",
+      "methodLabel": "Deposit",
+      "payee": "Gift shop",
+      "status": "UNRECONCILED",
+      "uuid": "bb956a7c-7894-4a51-ba68-e4d639b94278"
+    },
+    {
+      "amount": -50,
+      "category": [
+        "Car",
+        "Fuel"
+      ],
+      "comment": "I used to have a full tank with 20 EUR dammit!",
+      "date": "2025-08-22",
+      "methodLabel": "Direct debit",
+      "payee": "My Precious",
+      "status": "RECONCILED",
+      "tags": [
+        "gas"
+      ],
+      "uuid": "0ec48648-3134-464f-923f-7465cb327c77"
+    },
+    {
+      "amount": -15,
+      "category": [
+        "Car",
+        "Wash"
+      ],
+      "date": "2025-08-22",
+      "methodLabel": "Direct debit",
+      "payee": "My Precious",
+      "status": "CLEARED",
+      "uuid": "d9650cb0-5a26-4b07-8ec2-ae3862ef1c04"
+    },
+    {
+      "amount": -10.5,
+      "date": "2025-08-23",
+      "payee": "Peter's insurance co",
+      "splits": [
+        {
+          "amount": -5.6,
+          "category": [
+            "Insurance",
+            "House"
+          ],
+          "date": "2025-08-23",
+          "uuid": "8c48c466-a508-4580-8b84-4c212e603012"
+        },
+        {
+          "amount": -4.9,
+          "category": [
+            "Insurance",
+            "Car"
+          ],
+          "comment": "Peter ripped me off",
+          "date": "2025-08-23",
+          "uuid": "f1e6d341-9b36-4532-bf41-b9f0664edf69"
+        }
+      ],
+      "status": "UNRECONCILED",
+      "uuid": "2d38016c-a969-451e-ba69-41f5861597b4"
+    },
+    {
+      "amount": -123.45,
+      "category": [
+        "Transfer"
+      ],
+      "comment": "Moving to my other account",
+      "date": "2025-08-23",
+      "status": "UNRECONCILED",
+      "transferAccount": "Transferred To",
+      "uuid": "61d69cbd-0de6-4597-b2d0-57ffc4f0b0ae"
+    }
+  ]
+}

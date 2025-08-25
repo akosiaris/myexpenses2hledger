@@ -1,0 +1,16 @@
+2025-08-22 (bb956a7c-7894-4a51-ba68-e4d639b94278) Gift shop  ; Gift for Alice
+    Gifts              -10 EUR
+    ExportingAccount    10 EUR 
+2025-08-22 * (0ec48648-3134-464f-923f-7465cb327c77) My Precious  ; I used to have a full tank with 20 EUR dammit!
+    Car:Fuel            50 EUR
+    ExportingAccount   -50 EUR 
+2025-08-22 ! (d9650cb0-5a26-4b07-8ec2-ae3862ef1c04) My Precious
+    Car:Wash            15 EUR
+    ExportingAccount   -15 EUR 
+2025-08-23 (2d38016c-a969-451e-ba69-41f5861597b4) Peter's insurance co
+    Insurance:House      5.6 EUR
+    Insurance:Car        4.9 EUR
+    ExportingAccount   -10.5 EUR 
+2025-08-23 (61d69cbd-0de6-4597-b2d0-57ffc4f0b0ae)  ; Moving to my other account
+    Transferred To     123.45 EUR
+    ExportingAccount  -123.45 EUR 

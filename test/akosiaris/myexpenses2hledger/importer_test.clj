@@ -5,7 +5,7 @@
 
 (deftest load-my-expenses-json-test
   (testing "Importing a basic export works"
-    (let [data (-> "tests/exporting.json"
+    (let [data (-> "tests/MyExpensesJSONs/single_account_export.json"
                    resource
                    slurp
                    load-my-expenses-json)]
