@@ -3,7 +3,10 @@
             [java-time.api :as jt]
             [clojure.string :refer [join replace] :rename {replace str-replace}]
             [clojure.spec.alpha :as s]
+            [com.brunobonacci.mulog :as m]
             [akosiaris.myexpenses2hledger.spec :as spec]))
+
+(def ^:private dedup-struct (atom #{}))
 
 (defn- transform-json-keys
   "To be called by json/read and friends. Renames MyExpenses keys to hledger keys"
@@ -40,7 +43,12 @@
   [transaction balance-account commodity]
   ;; 3 different types of transactions are supported here
   (cond
-    ;; First off let's handles splits. We calculate all the splits, add the balancing transcation and flatten
+    ;; First off, let's avoid duplicates, by checking MyExpenses UUIDs and only including them once
+    (contains? @dedup-struct (:code transaction))
+    (do (m/log ::duplicate-transaction :level :WARN :code (:code transaction))
+        :clojure.spec.alpha/invalid)
+
+    ;; Let's handles splits. We calculate all the splits, add the balancing transcation and flatten
     (some? (:splits transaction))
     (let [ps (map #(assoc (select-keys % [:amount :account :cost]) :commodity commodity) (:splits transaction))
           bp {:amount (* -1 (:amount transaction))
@@ -48,6 +56,7 @@
               :commodity commodity}
           postings (flatten [ps bp])
           t (select-keys transaction [:date :payee :status :code :comment :tag :note])]
+      (swap! dedup-struct conj (:code transaction))
       (s/conform ::spec/transaction (assoc t :postings postings)))
     ;; Then transfers. Those have the payee set to the empty string and we know the accounts of both postings
     (some? (:transferAccount transaction))
@@ -55,6 +64,7 @@
           p2 (assoc p1 :amount (* -1 (:amount transaction))
                     :account balance-account)
           t (assoc (select-keys transaction [:date :payee :status :code :comment :tag :note]) :payee "")]
+      (swap! dedup-struct conj (:code transaction))
       (s/conform ::spec/transaction (assoc t :postings [p1 p2])))
     ;; Finally normal ones
     :else
@@ -62,16 +72,13 @@
           p2 (assoc p1 :amount (* -1 (:amount transaction))
                     :account balance-account)
           t (select-keys transaction [:date :payee :status :code :comment :tag :note])]
+      (swap! dedup-struct conj (:code transaction))
       (s/conform ::spec/transaction (assoc t :postings [p1 p2])))))
 
-(defn load-my-expenses-json
-  "Sets up the JSON loader, feeds it input and returns the result"
-  [input]
-  (let [data (json/read-str input
-                            ;:bigdec true
-                            :key-fn transform-json-keys
-                            :value-fn transform-json-values)
-        common (dissoc data :transactions)
+(defn- load-account
+  "Load 1 single MyExpenses exported account"
+  [data]
+  (let [common (dissoc data :transactions)
         commodity (:commodity common)
         openingp {:amount (:openingBalance common)
                   :account (:default-account common)
@@ -80,3 +87,16 @@
                   :postings [openingp]}
         transactions (map #(produce-transaction % (:default-account common) commodity) (:transactions data))]
     (filter #(not (s/invalid? %)) transactions)))
+
+(defn load-my-expenses-json
+  "Sets up the JSON loader, feeds it input and returns the result"
+  [input]
+  ;; TODO: Figure out whether this is the proper place for re-initilization of this atom
+  (reset! dedup-struct #{})
+  (let [data (json/read-str input
+                            :key-fn transform-json-keys
+                            :value-fn transform-json-values)
+        multi (vector? data)]
+    (if multi
+      (flatten (map load-account data))
+      (load-account data))))
