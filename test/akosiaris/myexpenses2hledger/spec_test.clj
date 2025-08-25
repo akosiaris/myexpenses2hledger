@@ -65,4 +65,9 @@
     (let [p1 {:amount 1M :commodity "EUR" :account "Expenses:Coffee"}
           p2 {:amount -2M :commodity "EUR" :account "Assets:Cash"}
           t1 {:date (jt/local-date "2025-08-20") :payee "Unbalanced coffee" :status "" :postings [p1 p2]}]
-      (is (not (s/valid? ::espec/transaction t1))))))
+      (is (not (s/valid? ::espec/transaction t1)))))
+  (testing "Accounts,payees with slashes"
+    (let [p1 {:amount 10.1M :commodity "EUR" :account "Expenses:Coffee/Croissants"}
+          p2 {:amount -10.1M :commodity "EUR" :account "Assets:PocketMoney"}
+          t1 {:date (jt/local-date "2025-08-20") :payee "Payee with sla/sh" :status "" :postings [p1 p2]}]
+      (is (s/valid? ::espec/transaction t1)))))
