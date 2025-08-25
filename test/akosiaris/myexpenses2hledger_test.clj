@@ -2,6 +2,6 @@
   (:require [clojure.test :refer [deftest is testing]]
             [akosiaris.myexpenses2hledger :as sut])) ; system under test
 
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 0 1))))
+(deftest validate-args-test
+  (testing "Proper option"
+    (is (map? (sut/validate-args '("--input" "foo" "--output" "bar"))))))

@@ -1,8 +1,10 @@
 (ns akosiaris.myexpenses2hledger
   (:require [clojure.tools.cli :refer [parse-opts]]
             [clojure.string :as string]
+            [clojure.java.io :as io]
             [akosiaris.myexpenses2hledger.logsetup :refer [setup-logging]]
-            [com.brunobonacci.mulog :as m])
+            [akosiaris.myexpenses2hledger.importer :refer [load-my-expenses-json]]
+            [akosiaris.myexpenses2hledger.outputter :refer [write-hledger-journal]])
   (:gen-class))
 
 (def ^:private VERSION "0.0.1")
@@ -62,10 +64,17 @@
       :else
       {:options options})))
 
-(defn greet
+(defn hledgerize
   "Callable entry point to the application."
-  [data]
-  (println (str "Hello, " (or (:name data) "World") "!")))
+  [{:keys [input output]}]
+  (if (.isDirectory (io/file input))
+    ;; We are working with a directory, we need to walk it
+    ()
+    ;; Otherwise it's either a single account or a merged account file, treatment is
+    ;; abstracted by called function
+    (let [transactions (-> input slurp load-my-expenses-json)]
+      (write-hledger-journal transactions output)
+      )))
 
 (defn -main
   "Main function"
@@ -75,4 +84,4 @@
       (exit (if ok? 0 1) exit-message))
     ;; Setup logging
     (setup-logging (assoc options :version VERSION))
-    (exit 1 (str "Not implemented yet. Options: " options))))
+    (hledgerize options)))
