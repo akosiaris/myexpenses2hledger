@@ -45,7 +45,7 @@
   (cond
     ;; First off, let's avoid duplicates, by checking MyExpenses UUIDs and only including them once
     (contains? @dedup-struct (:code transaction))
-    (do (m/log ::duplicate-transaction :level :WARN :code (:code transaction))
+    (do (m/log ::duplicate-transaction :level :INFO :code (:code transaction))
         :clojure.spec.alpha/invalid)
 
     ;; Let's handles splits. We calculate all the splits, add the balancing transcation and flatten
