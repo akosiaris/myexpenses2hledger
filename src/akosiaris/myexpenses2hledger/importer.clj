@@ -55,25 +55,37 @@
               :account balance-account
               :commodity commodity}
           postings (flatten [ps bp])
-          t (select-keys transaction [:date :payee :status :code :comment :tag :note])]
+          t (select-keys transaction [:date :payee :status :code :comment :tag :note])
+          ft (assoc t :postings postings)
+          conform (s/conform ::spec/transaction ft)]
       (swap! dedup-struct conj (:code transaction))
-      (s/conform ::spec/transaction (assoc t :postings postings)))
+      (when (s/invalid? conform)
+        (m/log ::non-conforming-split-transaction :error (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft)))))
+      conform)
     ;; Then transfers. Those have the payee set to the empty string and we know the accounts of both postings
     (some? (:transferAccount transaction))
     (let [p1 (assoc (select-keys transaction [:amount :cost]) :account (:transferAccount transaction) :commodity commodity)
           p2 (assoc p1 :amount (* -1 (:amount transaction))
                     :account balance-account)
-          t (assoc (select-keys transaction [:date :payee :status :code :comment :tag :note]) :payee "")]
+          t (assoc (select-keys transaction [:date :payee :status :code :comment :tag :note]) :payee "")
+          ft (assoc t :postings [p1 p2])
+          conform (s/conform ::spec/transaction ft)]
       (swap! dedup-struct conj (:code transaction))
-      (s/conform ::spec/transaction (assoc t :postings [p1 p2])))
+      (when (s/invalid? conform)
+        (m/log ::non-conforming-transfer-transaction :error (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft)))))
+      conform)
     ;; Finally normal ones
     :else
     (let [p1 (assoc (select-keys transaction [:amount :account :cost]) :commodity commodity)
           p2 (assoc p1 :amount (* -1 (:amount transaction))
                     :account balance-account)
-          t (select-keys transaction [:date :payee :status :code :comment :tag :note])]
+          t (select-keys transaction [:date :payee :status :code :comment :tag :note])
+          ft (assoc t :postings [p1 p2])
+          conform (s/conform ::spec/transaction ft)]
       (swap! dedup-struct conj (:code transaction))
-      (s/conform ::spec/transaction (assoc t :postings [p1 p2])))))
+      (when (s/invalid? conform)
+        (m/log ::non-conforming-standard-transaction :error (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft)))))
+      conform)))
 
 (defn- load-account
   "Load 1 single MyExpenses exported account"
