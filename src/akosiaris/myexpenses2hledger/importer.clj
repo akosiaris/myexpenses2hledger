@@ -101,10 +101,10 @@
   (if (> 0 (:openingBalance data))
     (let [date (apply jt/min (map :date (:transactions data)))
           openingposting1 {:amount (:openingBalance data)
-                           :account (:default-account data)
+                           :account equity-account
                            :commodity (:commodity data)}
           openingposting2 {:amount (* -1 (:openingBalance data))
-                           :account equity-account
+                           :account (:default-account data)
                            :commodity (:commodity data)}
           openingtransaction {:code (:code data)
                               :date date
