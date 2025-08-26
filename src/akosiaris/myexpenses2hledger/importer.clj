@@ -45,7 +45,9 @@
   (cond
     ;; First off, let's avoid duplicates, by checking MyExpenses UUIDs and only including them once
     (contains? @dedup-struct (:code transaction))
-    (do (m/log ::duplicate-transaction :level :INFO :code (:code transaction))
+    (do (m/log ::duplicate-transaction
+               :level :INFO
+               :code (:code transaction))
         :clojure.spec.alpha/invalid)
 
     ;; Let's handles splits. We calculate all the splits, add the balancing transcation and flatten
@@ -60,7 +62,9 @@
           conform (s/conform ::spec/transaction ft)]
       (swap! dedup-struct conj (:code transaction))
       (when (s/invalid? conform)
-        (m/log ::non-conforming-split-transaction :error (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft)))))
+        (m/log ::non-conforming-split-transaction
+               :level :WARN
+               :problem (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft)))))
       conform)
     ;; Then transfers. Those have the payee set to the empty string and we know the accounts of both postings
     (some? (:transferAccount transaction))
@@ -72,7 +76,9 @@
           conform (s/conform ::spec/transaction ft)]
       (swap! dedup-struct conj (:code transaction))
       (when (s/invalid? conform)
-        (m/log ::non-conforming-transfer-transaction :error (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft)))))
+        (m/log ::non-conforming-transfer-transaction
+               :level :WARN
+               :problem (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft)))))
       conform)
     ;; Finally normal ones
     :else
@@ -84,7 +90,9 @@
           conform (s/conform ::spec/transaction ft)]
       (swap! dedup-struct conj (:code transaction))
       (when (s/invalid? conform)
-        (m/log ::non-conforming-standard-transaction :error (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft)))))
+        (m/log ::non-conforming-standard-transaction
+               :level :WARN
+               :problem (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft)))))
       conform)))
 
 (defn- create-opening-balance-transaction
