@@ -13,7 +13,7 @@
           content (-> input
                       io/resource
                       slurp)
-          data (-> jsonfile io/resource slurp load-my-expenses-json)
+          data (-> jsonfile io/resource slurp (load-my-expenses-json "equity"))
           temp-file (io/file output)]
       (write-hledger-journal data temp-file)
       (is (= (-> temp-file slurp) content))

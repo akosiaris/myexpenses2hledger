@@ -87,28 +87,54 @@
         (m/log ::non-conforming-standard-transaction :error (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft)))))
       conform)))
 
+(defn- create-opening-balance-transaction
+  "Creates the Opening Balance transaction for the account, but only if there an opening balance"
+  [data equity-account]
+  (if (> 0 (:openingBalance data))
+    (let [date (apply jt/min (map :date (:transactions data)))
+          openingposting1 {:amount (:openingBalance data)
+                           :account (:default-account data)
+                           :commodity (:commodity data)}
+          openingposting2 {:amount (* -1 (:openingBalance data))
+                           :account equity-account
+                           :commodity (:commodity data)}
+          openingtransaction {:code (:code data)
+                              :date date
+                              :status "*" ;; TODO: Should it really be CLEARED?
+                              :payee "Opening Balance"
+                              :postings [openingposting1 openingposting2]}
+          conform (s/conform ::spec/transaction openingtransaction)]
+      (if (s/invalid? conform)
+        (do
+          (m/log ::non-conforming-opening-balance-transaction
+                 :level :WARN
+                 :data openingtransaction
+                 :problem (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction openingtransaction))))
+          conform)
+        (do
+          (m/log ::opening-balance-transaction
+                 :level :INFO
+                 :transaction openingtransaction)
+          conform)))
+        :clojure.spec.alpha/invalid))
+
 (defn- load-account
   "Load 1 single MyExpenses exported account"
-  [data]
-  (let [common (dissoc data :transactions)
-        commodity (:commodity common)
-        openingp {:amount (:openingBalance common)
-                  :account (:default-account common)
-                  :commodity commodity}
-        openingt {:code (:code common)
-                  :postings [openingp]}
-        transactions (map #(produce-transaction % (:default-account common) commodity) (:transactions data))]
+  [data equity-account]
+  (let [commodity (:commodity data)
+        obt (create-opening-balance-transaction data equity-account)
+        transactions (cons obt (map #(produce-transaction % (:default-account data) commodity) (:transactions data)))]
     (filter #(not (s/invalid? %)) transactions)))
 
 (defn load-my-expenses-json
   "Sets up the JSON loader, feeds it input and returns the result"
-  [input]
+  [input equity-account]
   ;; TODO: Figure out whether this is the proper place for re-initilization of this atom
   (reset! dedup-struct #{})
   (let [data (json/read-str input
                             :key-fn transform-json-keys
                             :value-fn transform-json-values)
-        multi (vector? data)]
-    (if multi
-      (flatten (map load-account data))
-      (load-account data))))
+        merged (vector? data)]
+    (if merged
+      (flatten (map #(load-account % equity-account) data))
+      (load-account data equity-account))))

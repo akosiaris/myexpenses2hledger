@@ -14,6 +14,9 @@
    ["-o" "--output FILE" "Path to output" :missing "Output file required"]
    ;; input. Can be a file or a directory
    ["-i" "--input FILE" "Path to input. Can be file or directory" :missing "Input file/directory required"]
+   ;; Equity
+   [nil "--equity-account EQUITY" "Equity account name. Defaults to 'equity:opening balances'"
+    :default "equity:opening balances"]
    ;; Logging scheme
    [nil "--ecs-logging" "Use Elastic Common Schema logging. Useful if structured logging is required"]
    ["-v" "--verbose" "Verbosity level. May be specific multiple times to increase level"
@@ -66,13 +69,13 @@
 
 (defn hledgerize
   "Callable entry point to the application."
-  [{:keys [input output]}]
+  [{:keys [input output equity-account]}]
   (if (.isDirectory (io/file input))
     ;; We are working with a directory, we need to walk it
     ()
     ;; Otherwise it's either a single account or a merged account file, treatment is
     ;; abstracted by called function
-    (let [transactions (-> input slurp load-my-expenses-json)]
+    (let [transactions (-> input slurp (load-my-expenses-json equity-account))]
       (write-hledger-journal transactions output)
       )))
 

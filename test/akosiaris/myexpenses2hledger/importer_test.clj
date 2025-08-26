@@ -8,5 +8,5 @@
     (let [data (-> "tests/MyExpensesJSONs/single_account_export.json"
                    resource
                    slurp
-                   load-my-expenses-json)]
+                   (load-my-expenses-json "equity"))]
       (is (some? (seq data))))))
