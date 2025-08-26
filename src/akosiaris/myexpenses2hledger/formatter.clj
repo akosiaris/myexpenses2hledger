@@ -39,7 +39,7 @@
   "Left pads amount up to max-length"
   [max-length amount]
   (let [pad-length (- max-length (amount-integer-part amount))]
-    (format " %s%s" (apply str (repeat pad-length " ")) amount)))
+    (format " %s%.2f" (apply str (repeat pad-length " ")) amount)))
 
 
 (defn format-posting

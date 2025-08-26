@@ -61,20 +61,20 @@
   (testing "Bare minimum postings"
     (let [p1 {:account "expenses" :amount 1M :commodity "EUR"}
           p2 {:account "assets" :amount -1M :commodity "$"}]
-      (is (= "    expenses  1 EUR" (f/format-posting p1)))
-      (is (= "    assets  -1 $" (f/format-posting p2)))))
+      (is (= "    expenses  1.00 EUR" (f/format-posting p1)))
+      (is (= "    assets  -1.00 $" (f/format-posting p2)))))
   (testing "With a status"
     (let [p1 {:account "expenses" :amount 1M :commodity "EUR" :status "*"}]
-      (is (= "    * expenses  1 EUR" (f/format-posting p1)))))
+      (is (= "    * expenses  1.00 EUR" (f/format-posting p1)))))
   (testing "With a cost"
     (let [p1 {:account "expenses" :amount 1M :commodity "EUR" :cost 1.5M}]
-      (is (= "    expenses  1 EUR @ 1.5" (f/format-posting p1)))))
+      (is (= "    expenses  1.00 EUR @ 1.5" (f/format-posting p1)))))
   (testing "With a comment"
     (let [p1 {:account "expenses" :amount 1M :commodity "EUR" :comment "A comment"}]
-      (is (= "    expenses  1 EUR  ; A comment" (f/format-posting p1)))))
+      (is (= "    expenses  1.00 EUR  ; A comment" (f/format-posting p1)))))
   (testing "With Unicode in the name"
     (let [p1 {:account "Έξοδα-你" :amount 1M :commodity "EUR" :comment "A comment"}]
-      (is (= "    Έξοδα-你  1 EUR  ; A comment" (f/format-posting p1))))))
+      (is (= "    Έξοδα-你  1.00 EUR  ; A comment" (f/format-posting p1))))))
 
 
 (deftest proper-transactions
@@ -94,7 +94,7 @@
               :payee "Pending"
               :status "!"
               :postings [p1, p2]}]
-      (is (= "2025-08-20 ! Pending\n    expenses   1 EUR\n    assets    -1 $" (f/format-transaction t1))))))
+      (is (= "2025-08-20 ! Pending\n    expenses   1.00 EUR\n    assets    -1.00 $" (f/format-transaction t1))))))
 
 (deftest against-fixture-transactions
   (testing "single-transaction"
