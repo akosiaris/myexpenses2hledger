@@ -10,4 +10,4 @@
   (let [data (map transaction-max-lengths transactions)
         max-account-length (apply max (map :max-account-length data))
         max-integer-amount-length (apply max (map :max-integer-amount-length data))]
-    (spit outfile (with-out-str (mapv #(print (format-transaction % max-account-length max-integer-amount-length) "\n") transactions)))))
+    (spit outfile (clojure.string/join "\n" (map #(format "%s\n" (format-transaction % max-account-length max-integer-amount-length)) transactions)))))
