@@ -5,7 +5,7 @@
 * [ ] Write docs
 * [ ] Update README
 * [ ] Build and test uberjar
-* [ ] Implement processing directory
+* [x] Implement processing directory
 * [ ] Resolve code TODOs
 * [ ] Document the need to define accounts
 * [ ] Build docker image
