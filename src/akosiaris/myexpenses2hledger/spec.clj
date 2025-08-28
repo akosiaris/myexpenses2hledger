@@ -1,6 +1,6 @@
 (ns akosiaris.myexpenses2hledger.spec
   (:require [clojure.spec.alpha :as s]
-             [java-time.api :as jt]))
+            [java-time.api :as jt]))
 
 ;; Some useful defs
 ;; An account name can support hierarchies via the : sign.
@@ -31,18 +31,20 @@
 (s/def ::account (s/and string? account?))
 (s/def ::commodity (s/and string? commodity?))
 (s/def ::tag (s/and string? tag?))
+(s/def ::tags (s/coll-of ::tag
+                         :kind vector
+                         :min-count 1))
 (s/def ::comment string?)
 
 ;; posting stuff
 (s/def ::cost decimal?)
 (s/def ::posting (s/keys :req-un [::amount
                                   ::account
-                                  ::commodity
-                                  ]
+                                  ::commodity]
                          :opt-un [::cost
                                   ::status
                                   ::comment
-                                  ::tag]))
+                                  ::tags]))
 
 ;; transaction stuff
 (s/def ::note string?)
@@ -60,5 +62,5 @@
                              :opt-un [::code
                                       ::note
                                       ::comment
-                                      ::tag
+                                      ::tags
                                       ::postings]))

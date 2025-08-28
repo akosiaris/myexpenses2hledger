@@ -11,6 +11,7 @@
 * [ ] Build docker image
 * [ ] Experiment with babashka
 * [ ] Upload to Github
+* [x] Handle tags
 
 FIXME: my new application.
 

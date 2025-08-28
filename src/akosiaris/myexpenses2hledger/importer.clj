@@ -57,7 +57,7 @@
               :account balance-account
               :commodity commodity}
           postings (flatten [ps bp])
-          t (select-keys transaction [:date :payee :status :code :comment :tag :note])
+          t (select-keys transaction [:date :payee :status :code :comment :tags :note])
           ft (assoc t :postings postings)
           conform (s/conform ::spec/transaction ft)]
       (swap! dedup-struct conj (:code transaction))
@@ -71,7 +71,7 @@
     (let [p1 (assoc (select-keys transaction [:amount :cost]) :account (:transferAccount transaction) :commodity commodity)
           p2 (assoc p1 :amount (* -1 (:amount transaction))
                     :account balance-account)
-          t (assoc (select-keys transaction [:date :payee :status :code :comment :tag :note]) :payee "")
+          t (assoc (select-keys transaction [:date :payee :status :code :comment :tags :note]) :payee "")
           ft (assoc t :postings [p1 p2])
           conform (s/conform ::spec/transaction ft)]
       (swap! dedup-struct conj (:code transaction))
@@ -85,7 +85,7 @@
     (let [p1 (assoc (select-keys transaction [:amount :account :cost]) :commodity commodity)
           p2 (assoc p1 :amount (* -1 (:amount transaction))
                     :account balance-account)
-          t (select-keys transaction [:date :payee :status :code :comment :tag :note])
+          t (select-keys transaction [:date :payee :status :code :comment :tags :note])
           ft (assoc t :postings [p1 p2])
           conform (s/conform ::spec/transaction ft)]
       (swap! dedup-struct conj (:code transaction))

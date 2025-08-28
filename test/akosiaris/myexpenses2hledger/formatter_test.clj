@@ -180,7 +180,7 @@
           t1 {:date (jt/local-date "2024-01-03")
               :payee "Artie's Deli"
               :status ""
-              :tag "worktrips:"
+              :tags ["worktrips:"]
               :postings [p1, p2]}
           fixture (-> "tests/transaction_with_tag.hledger"
                       resource

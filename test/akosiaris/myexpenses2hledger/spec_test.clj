@@ -28,10 +28,10 @@
     (let [t1 {:date (jt/local-date "2025-08-20") :payee "Bar Foo" :note "foobar" :status ""}]
       (is (s/valid? ::espec/transaction t1))))
   (testing "Transaction with a bad tag"
-    (let [t1 {:date (jt/local-date "2025-08-20") :payee "Awful tag" :tag "bad tag:" :status ""}]
+    (let [t1 {:date (jt/local-date "2025-08-20") :payee "Awful tag" :tags "bad tag:" :status ""}]
       (is (not (s/valid? ::espec/transaction t1)))))
   (testing "Transaction with a valid tag"
-    (let [t1 {:date (jt/local-date "2025-08-20") :payee "Nice ztag" :tag "good-tag:" :status ""}]
+    (let [t1 {:date (jt/local-date "2025-08-20") :payee "Nice ztag" :tags ["good-tag:"] :status ""}]
       (is (s/valid? ::espec/transaction t1))))
   (testing "Transaction with a code"
     (let [t1 {:date (jt/local-date "2025-08-20") :payee "Cool code" :code "someuuid" :status ""}]

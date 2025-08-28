@@ -1,7 +1,7 @@
 (ns akosiaris.myexpenses2hledger.formatter
   (:require [akosiaris.myexpenses2hledger.spec :as spec]
             [clojure.spec.alpha :as s]
-            [clojure.string :refer [blank? split]]
+            [clojure.string :refer [blank? split join]]
             [java-time.api :as jt]))
 
 (def date-format :iso-local-date)
@@ -51,11 +51,11 @@
    (let [ffs [[:status, identity]
               [:account, #(pad-account max-account-length %)]
               [:amount, #(pad-amount max-integer-amount-length %)]
-              [:commodity, #(if (re-matches #" " %) (format "\"%s\"" %) (identity %))] ; TODO: solve this for proper alignment
-              ; TODO: This needs more work to reflect both unit price and total price as well as cost commodity
-              [:cost, #(if % (format "@ %s" %) (identity %))] ; TODO: solve this for proper alignment
-              [:comment, #(if % (format " ; %s" %) (identity %))] ; TODO: solve this for proper alignment
-              [:tag, identity]] ; TODO: solve this for proper alignment
+              [:commodity, #(if (re-matches #" " %) (format "\"%s\"" %) (identity %))]
+              ; TODO: This needs more work to reflect both unit price and total price as well as cost commodity and get properly aligned
+              [:cost, #(if % (format "@ %s" %) (identity %))]
+              [:comment, #(if % (format " ; %s" %) (identity %))]
+              [:tags, #(join " " %)]]
          r (mapv #((second %) (get posting (first %))) ffs)]
      (reduce #(if (blank? %2) %1 (str %1 " " %2)) (apply str (repeat 3 " ")) r))))
 
@@ -63,7 +63,7 @@
   "Formats the transaction header, that is date, payee, status, code, comment, tag"
   [transaction]
   {:pre [(s/valid? ::spec/transaction transaction)]}
-  (let [ctag (if (or (:comment transaction) (:tag transaction)) true false)
+  (let [ctag (if (or (:comment transaction) (:tags transaction)) true false)
         t (assoc transaction :ctag ctag)
         ffs [[:date, #(jt/format date-format %)]
              [:status, identity]
@@ -71,10 +71,12 @@
              [:payee, identity]
              [:note, #(if % (format "| %s" %) %)]
              [:ctag, #(if % " ;" "")]
-             [:comment, identity] ; TODO: solve this for proper alignment
-             [:tag, identity]] ; TODO: solve this for proper alignment
+             [:comment, identity]
+             [:tags, #(join " " %)]]
         r (mapv #((second %) (get t (first %))) ffs)]
-    (reduce #(if (blank? %2) %1 (str %1 " " %2)) r)))
+    (reduce #(if
+              (blank? %2) %1
+              (str %1 " " %2)) r)))
 
 (defn format-transaction
   "Formats a transaction in the hledger format"
