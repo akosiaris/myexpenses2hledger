@@ -12,8 +12,8 @@
           :exec-args {:input "input.json"
                       :output "output.json"
                       :equity-account "equity:opening balances"}}
-  :build {:deps {io.github.clojure/tools.build
-                 {:mvn/version "0.10.10"}}
+  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.10"}
+                 slipset/deps-deploy {:mvn/version "0.2.2"}}
           :ns-default build}
   :test {:extra-paths ["test"]
          :extra-deps {org.clojure/test.check {:mvn/version "1.1.1"}
