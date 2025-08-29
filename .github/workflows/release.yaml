@@ -1,16 +1,17 @@
 name: Clojure CI
 
 on:
-  push:
+  release:
+    types:
+      - published
     branches: ["main"]
 
 jobs:
   clojure:
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-      # os: [ubuntu-latest, macOS-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout
@@ -31,8 +32,9 @@ jobs:
           # to always provision the latest version
           cli: latest
 
-      - name: Execute clojure tests
-        run: clojure -T:build test
-
       - name: Build the jar
         run: clojure -T:build ci
+        env:
+          CLOJARS_URL: https://maven.pkg.github.com/akosiaris/myexpenses2hledger
+          CLOJARS_USERNAME: akosiaris
+          CLOJARS_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
