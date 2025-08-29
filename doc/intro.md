@@ -52,4 +52,4 @@ from scratch. Both approaches work fine.
 
 ## Usage
 
-[[usage.md]]
+[Usage](usage.md)

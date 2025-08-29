@@ -11,7 +11,7 @@ compatible journal file.
 
 ## Documentation
 
-Head over to [[doc/intro.md]]
+Head over to [Documentation](doc/intro.md)
 
 ## TODO
 
