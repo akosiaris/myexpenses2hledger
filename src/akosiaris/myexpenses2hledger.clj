@@ -74,15 +74,19 @@
   (m/log ::parsing-input
          :level :INFO
          :file input)
-  (if (.isDirectory (io/file input))
-    ;; We are working with a directory, we need to walk it. We don't support recursive though, on purpose
-    (let [jfs (-> input io/file .listFiles)
-          transactions (mapcat #(-> % slurp (load-my-expenses-json equity-account)) jfs)]
-      (write-hledger-journal transactions output))
-    ;; Otherwise it's either a single account or a merged account file, treatment is
-    ;; abstracted by called function
-    (let [transactions (-> input slurp (load-my-expenses-json equity-account))]
-      (write-hledger-journal transactions output))))
+  ;; Coerce to string as we might get a keyword when using -X:run-x
+  (let [inp (str input)
+        outp (str output)
+        equity (str equity-account)]
+    (if (.isDirectory (io/file inp))
+      ;; We are working with a directory, we need to walk it. We don't support recursive though, on purpose
+      (let [jfs (-> inp io/file .listFiles)
+            transactions (mapcat #(-> % slurp (load-my-expenses-json equity)) jfs)]
+        (write-hledger-journal transactions outp))
+      ;; Otherwise it's either a single account or a merged account file, treatment is
+      ;; abstracted by called function
+      (let [transactions (-> inp slurp (load-my-expenses-json equity))]
+        (write-hledger-journal transactions outp)))))
 
 (defn -main
   "Main function"
