@@ -9,7 +9,9 @@
  {:run-m {:main-opts ["-m" "akosiaris.myexpenses2hledger"]}
   :run-x {:ns-default akosiaris.myexpenses2hledger
           :exec-fn hledgerize
-          :exec-args {:input "input.json" :output "output.json"}}
+          :exec-args {:input "input.json"
+                      :output "output.json"
+                      :equity-account "equity:opening balances"}}
   :build {:deps {io.github.clojure/tools.build
                  {:mvn/version "0.10.10"}}
           :ns-default build}
