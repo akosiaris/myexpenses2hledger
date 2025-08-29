@@ -16,6 +16,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # We develop on Temurin 21.x, let's use that on CI too
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
       - name: Install clojure tools
         uses: DeLaGuardo/setup-clojure@13.4
         with:
@@ -27,3 +33,6 @@ jobs:
 
       - name: Execute clojure tests
         run: clojure -T:build test
+
+      - name: Build the jar
+        run: clojure -T:build ci
