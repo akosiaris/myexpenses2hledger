@@ -10,10 +10,22 @@ exporting already exported transactions.
 
 ### Transformation
 
-Run
+If you got Clojure around, run:
 
 ```bash
 $ clojure -M:run-m --input <path_to_input> --output <path_to_output>
+```
+
+If you don't have Clojure but do have Java. run:
+
+```bash
+$ java -jar myexpenses2hledger-0.1.0-standalone.jar --input <path_to_input> --output <path_to_output>
+```
+
+And finally, if you got neither but have/prefer Docker/Podman:
+
+```bash
+TODO: Section to be filled once we publish a container
 ```
 
 where input is either of the ones below:
