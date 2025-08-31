@@ -16,6 +16,7 @@
     (= k "currency") :commodity
     (= k "label") :default-account
     (= k "category") :account
+    (= k "methodLabel") :note
     :else (keyword k)))
 
 (defn- transform-json-values
@@ -31,8 +32,6 @@
     (= k :account) (join ":" v)
     ;; Switch tags to the hledger syntax
     (= k :tags) (mapv #(format "%s:" (str-replace % " " "-")) v)
-    ;; Delete methodLabel
-    (= k :methodLabel) transform-json-values
     ;; Force Decimal for accuracy, flip the sign since MyExpenses has a negative sign for all expenses
     (number? v) (* -1 (bigdec v))
     ;; Otherwise return value as is

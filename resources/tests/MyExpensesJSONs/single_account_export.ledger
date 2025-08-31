@@ -2,15 +2,15 @@
     equity              -1.00 EUR
     ExportingAccount     1.00 EUR
 
-2025-08-22 (bb956a7c-7894-4a51-ba68-e4d639b94278) Gift shop  ; Gift for Alice
+2025-08-22 (bb956a7c-7894-4a51-ba68-e4d639b94278) Gift shop | Deposit  ; Gift for Alice
     Gifts              -10.00 EUR
     ExportingAccount    10.00 EUR
 
-2025-08-22 * (0ec48648-3134-464f-923f-7465cb327c77) My Precious  ; I used to have a full tank with 20 EUR dammit! gas:
+2025-08-22 * (0ec48648-3134-464f-923f-7465cb327c77) My Precious | Direct debit  ; I used to have a full tank with 20 EUR dammit! gas:
     Car:Fuel            50.00 EUR
     ExportingAccount   -50.00 EUR
 
-2025-08-22 ! (d9650cb0-5a26-4b07-8ec2-ae3862ef1c04) My Precious
+2025-08-22 ! (d9650cb0-5a26-4b07-8ec2-ae3862ef1c04) My Precious | Direct debit
     Car:Wash            15.00 EUR
     ExportingAccount   -15.00 EUR
 

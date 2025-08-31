@@ -37,11 +37,11 @@ from scratch. Both approaches work fine.
 * Transaction ids (also known as code)
 * Duplicate transaction detection (happens when exporting multiple accounts)
 * Transfers between MyExpenses accounts
+* MyExpenses payment methods (they are mapped to hledger notes)
 
 ## Not supported yet
 
-* [ ] Payment methods (maybe we can map it to the **note** concept of ledger/hledger).
-* [ ] Original currency amount (appears to not be exported)
+* [ ] Original currency amount (appears to not be exported in the JSON, just the CSV)
 * [ ] Beancount. Looks like one can transform from ledger/hledger to beancount and vice versa though
 
 ## Out of scope
