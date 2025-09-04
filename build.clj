@@ -30,8 +30,9 @@
          :src-dirs ["src"]
          :ns-compile [main]))
 
-(defn ci "Run the CI pipeline of tests, build the uberjar and upload it" [opts]
-  (test opts)
+(defn uberjar
+  "Build the uber jar"
+  [opts]
   (b/delete {:path "target"})
   (let [opts (create-opts opts)]
     (println "\nCopying source...")
@@ -39,12 +40,18 @@
     (println (str "\nCompiling " main "..."))
     (b/compile-clj opts)
     (println "\nBuilding uber JAR..." (:uber-file opts))
-    (b/uber opts)
-    ;; Re-create the pom.xml to appease deps-deploy who seeks it
-    ;; a pom.xml in the current directory
-    (b/write-pom (assoc (dissoc opts :class-dir) :target "."))
-    ;; Upload uberjar
-    (d/deploy {:installer :remote
-               :sign-releases? false
-               :artifact uber-file}))
+    (b/uber opts)))
+
+(defn ci
+  "Run the CI pipeline of tests, build the uberjar and upload it"
+  [opts]
+  (test opts)
+  (uberjar opts)
+  ;; Re-create the pom.xml to appease deps-deploy who seeks it
+  ;; a pom.xml in the current directory
+  (b/write-pom (assoc (dissoc opts :class-dir) :target "."))
+  ;; Upload uberjar
+  (d/deploy {:installer :remote
+              :sign-releases? false
+              :artifact uber-file})
   opts)
