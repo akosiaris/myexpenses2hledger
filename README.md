@@ -100,6 +100,11 @@ developing and logging is interfering.
 $ clojure -T:build test
 ```
 
+### Build an uberjar
+```shell
+$ clojure -T:build uberjar
+```
+
 ###  Run CI
 
 Run the project's CI pipeline and build an uberjar, uploading it to Clojars

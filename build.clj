@@ -9,7 +9,9 @@
 (def class-dir "target/classes")
 (def uber-file (format "target/%s-%s-standalone.jar" lib version))
 
-(defn test "Run all the tests." [opts]
+(defn test
+  "Run all the tests."
+  [opts]
   (let [basis    (b/create-basis {:aliases [:test]})
         cmds     (b/java-command
                   {:basis     basis
@@ -30,16 +32,23 @@
          :src-dirs ["src"]
          :ns-compile [main]))
 
-(defn ci "Run the CI pipeline of tests, build the uberjar and upload it" [opts]
-  (test opts)
+(defn uberjar
+  "Build the uber jar"
+  [opts]
   (b/delete {:path "target"})
+  (println "\nCopying source...")
+  (b/copy-dir {:src-dirs ["resources" "src"] :target-dir class-dir})
+  (println (str "\nCompiling " main "..."))
+  (b/compile-clj opts)
+  (println "\nBuilding uber JAR..." (:uber-file opts))
+  (b/uber opts))
+
+(defn ci
+  "Run the CI pipeline of tests, build the uberjar and upload it"
+  [opts]
   (let [opts (create-opts opts)]
-    (println "\nCopying source...")
-    (b/copy-dir {:src-dirs ["resources" "src"] :target-dir class-dir})
-    (println (str "\nCompiling " main "..."))
-    (b/compile-clj opts)
-    (println "\nBuilding uber JAR..." (:uber-file opts))
-    (b/uber opts)
+    (test opts)
+    (uberjar opts)
     ;; Re-create the pom.xml to appease deps-deploy who seeks it
     ;; a pom.xml in the current directory
     (b/write-pom (assoc (dissoc opts :class-dir) :target "."))
