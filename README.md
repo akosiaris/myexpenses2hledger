@@ -178,6 +178,8 @@ something like
 $ export LC_ALL=C.utf8
 ```
 
+If using podman/docker, you need to pass -e LC_ALL=C.utf8
+
 ### Thanks
 
 To Sean Corfield for his [deps-new](https://github.com/seancorfield/deps-new),
