@@ -22,10 +22,10 @@ If you don't have Clojure but do have Java. run:
 $ java -jar myexpenses2hledger-0.1.0-standalone.jar --input <path_to_input> --output <path_to_output>
 ```
 
-And finally, if you got neither but have/prefer Docker/Podman:
+And finally, if you got neither but have/prefer Docker/Podman, assuming your export is in the local directory
 
 ```bash
-TODO: Section to be filled once we publish a container
+$ docker run -v `pwd`:/data -it docker.io/akosiaris/myexpenses2hledger -i /data/export.json -o /data/foo.journal
 ```
 
 where input is either of the ones below:
@@ -33,7 +33,10 @@ where input is either of the ones below:
 * A merged account JSON export file (A summary/total account was selected and the relevant box ticked)
 * A directory of single account JSON export files. Same as above but the box wasn't ticked.
 
+* Look at the options section for other parameters to define
+
 The output is invariably a ledger/hledger journal file.
+
 You can now check that everything is OK with the journal produced
 ```bash
 $ hledger -f <output> check

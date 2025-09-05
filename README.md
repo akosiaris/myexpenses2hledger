@@ -18,7 +18,7 @@ Head over to [Documentation](doc/intro.md)
 * [x] Write docs
 * [x] Build and test uberjar
 * [x] Document the need to define accounts
-* [ ] Build docker image
+* [x] Build docker image
 * [ ] Experiment with babashka
 * [x] Upload to Github
 * [ ] Figure out whether I can do better with my fixtures for testing
