@@ -32,7 +32,7 @@
          :src-dirs ["src"]
          :ns-compile [main]))
 
-(defn uberjar
+(defn- uberjar
   "Build the uber jar"
   [opts]
   (b/delete {:path "target"})
@@ -53,7 +53,8 @@
     ;; a pom.xml in the current directory
     (b/write-pom (assoc (dissoc opts :class-dir) :target "."))
     ;; Upload uberjar
-    (d/deploy {:installer :remote
-               :sign-releases? false
-               :artifact uber-file}))
+    (when (:upload opts)
+      (d/deploy {:installer :remote
+                 :sign-releases? false
+                 :artifact uber-file})))
   opts)

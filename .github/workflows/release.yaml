@@ -33,7 +33,7 @@ jobs:
           cli: latest
 
       - name: Build the jar
-        run: clojure -T:build ci
+        run: clojure -T:build ci :upload true
         env:
           CLOJARS_URL: https://maven.pkg.github.com/akosiaris/myexpenses2hledger
           CLOJARS_USERNAME: akosiaris
