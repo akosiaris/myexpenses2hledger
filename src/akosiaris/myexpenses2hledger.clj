@@ -8,7 +8,7 @@
             [akosiaris.myexpenses2hledger.outputter :refer [write-hledger-journal]])
   (:gen-class))
 
-(def ^:private VERSION "0.0.1")
+(def ^:private VERSION "0.3.0")
 
 (def ^:private cli-options
   [;; output file
