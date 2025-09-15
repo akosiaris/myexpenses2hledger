@@ -17,33 +17,28 @@ If you have access to this feature from Github, it should work out of the box.
 Just start one from this repo
 
 ### Logging
-For logging, we use BrunoBonacci's
-[mulog](https://github.com/BrunoBonacci/mulog) library. We are still
-integrating it, but by default the program will output Clojure EDN maps to
-stdout, one line per item. An example is below
+For logging, we use Peter Taoussanis's
+[timbre](https://github.com/taoensso/timbre) library. We are still in the
+process of integrating it. In the default configuration the program will output lines like the following:
 
-```edn
-{:mulog/namespace "akosiaris.myexpenses2hledger.importer", :app-name
-"myexpenses2hledger", :env "local", :level :INFO, :code
-"c2733227-9c30-4be1-938a-dc315dbbf8f4", :mulog/timestamp 1756394833448,
-:version "0.0.1", :mulog/trace-id #mulog/flake
-"54zrmtIx6fmI_CdhpjnT5mWusSK7WVDc", :mulog/event-name
-:akosiaris.myexpenses2hledger.importer/duplicate-transaction}
 ```
+2025-09-15T08:50:54.259Z 75f27dbd4b15 INFO [akosiaris.myexpenses2hledger.logsetup:20] - :akosiaris.myexpenses2hledger.logsetup/log-pipeline-setup :version 0.0.1 :loglevel :info
+2025-09-15T08:41:52.083Z 75f27dbd4b15 INFO [akosiaris.myexpenses2hledger.importer:47] - :akosiaris.myexpenses2hledger.importer/duplicate-transaction :code 78eb53aa-9a10-47d1-adcb-c2aa60bec4e8
+2025-09-15T08:41:52.091Z 75f27dbd4b15 WARN [akosiaris.myexpenses2hledger.importer:89] - :akosiaris.myexpenses2hledger.importer/non-conforming-standard-transaction :problem {:path [:status], :pred #{"" "!" "*"}, :val nil, :via [:akosiaris.myexpenses2hledger.spec/transaction :akosiaris.myexpenses2hledger.spec/status], :in [:status]}
+```
+
+so, timestamp, id, level, file and line, event name and then information
+associated with the event. The syntax appears mildly to resemble EDN,
+espectially after the hyphen, but is not.
 
 These are undoubtedly hard to read to the untrained eye (and even the trained
 one), so I 've been experimenting with JSON logging too. Passing
-`--ecs-logging` as a parameter will output something like
-
-```json
-{"mulog/namespace":"akosiaris.myexpenses2hledger.importer","app-name":"myexpenses2hledger","env":"local","level":"INFO","code":"c2733227-9c30-4be1-938a-dc315dbbf8f4","mulog/timestamp":1756457356691,"version":"0.0.1","mulog/trace-id":"55-keDXlziZ7Z_wW9KAppy2C5Yr6RDjm","mulog/event-name":"akosiaris.myexpenses2hledger.importer/duplicate-transaction"}
-```
-
-which, while not a lot better, is something that more people will be used to.
-More importantly, it can be read using e.g. `jq` to manipulate it, selecting
-specific parts and pretty printing them. As the ECS prefix signifies, I aim to
-align with [Elastic Common Schema](https://www.elastic.co/docs/reference/ecs)
-if possible.
+`--ecs-logging` as a parameter will eventually output something which, while
+not a lot better, is something that more people will be used to.  More
+importantly, it will be able to be read using e.g. `jq` to manipulate it,
+selecting specific parts and pretty printing them. As the ECS prefix signifies,
+I aim to align with [Elastic Common
+Schema](https://www.elastic.co/docs/reference/ecs) if possible.
 
 ### Other entrypoints
 
