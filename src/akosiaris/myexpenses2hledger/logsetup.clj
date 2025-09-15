@@ -1,5 +1,5 @@
 (ns akosiaris.myexpenses2hledger.logsetup
-  (:require [com.brunobonacci.mulog :as m]))
+  (:require [taoensso.timbre :as t]))
 
 (defn setup-logging
   "Sets up a logging setup per configuration. Returns a no argument function that, if called, will start logging"
@@ -9,19 +9,18 @@
         (cond
             ; No verbosity => WARN
           (= verbose 0)
-          :WARN
+          :warn
             ; -v once => INFO
           (= verbose 1)
-          :INFO
+          :info
             ; -v more than once => DEBUG
           (> verbose 1)
-          :DEBUG)]
-    (m/set-global-context! {:app-name "myexpenses2hledger",
-                            :version version,
-                            :level defaultloglevel,
-                            :env "local"})
-    (m/log ::log-pipeline-setup "event" "Logging set up" :version version :loglevel defaultloglevel))
+          :debug)]
+    (t/set-min-level! defaultloglevel)
+    (t/info ::log-pipeline-setup :version version :loglevel defaultloglevel))
 
-  (if ecs-logging
-    (m/start-publisher! {:type :console-json})
-    (m/start-publisher! {:type :console})))
+  ; ECS logging not implemented yet
+  ;(if ecs-logging
+  ;  (m/start-publisher! {:type :console-json})
+  ;  (m/start-publisher! {:type :console}))
+  )

@@ -3,7 +3,7 @@
             [java-time.api :as jt]
             [clojure.string :refer [join replace] :rename {replace str-replace}]
             [clojure.spec.alpha :as s]
-            [com.brunobonacci.mulog :as m]
+            [taoensso.timbre :as t]
             [akosiaris.myexpenses2hledger.spec :as spec]))
 
 (def ^:private dedup-struct (atom #{}))
@@ -44,8 +44,7 @@
   (cond
     ;; First off, let's avoid duplicates, by checking MyExpenses UUIDs and only including them once
     (contains? @dedup-struct (:code transaction))
-    (do (m/log ::duplicate-transaction
-               :level :INFO
+    (do (t/info ::duplicate-transaction
                :code (:code transaction))
         :clojure.spec.alpha/invalid)
 
@@ -61,8 +60,7 @@
           conform (s/conform ::spec/transaction ft)]
       (swap! dedup-struct conj (:code transaction))
       (when (s/invalid? conform)
-        (m/log ::non-conforming-split-transaction
-               :level :WARN
+        (t/warn ::non-conforming-split-transaction
                :problem (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft)))))
       conform)
     ;; Then transfers. Those have the payee set to the empty string and we know the accounts of both postings
@@ -75,8 +73,7 @@
           conform (s/conform ::spec/transaction ft)]
       (swap! dedup-struct conj (:code transaction))
       (when (s/invalid? conform)
-        (m/log ::non-conforming-transfer-transaction
-               :level :WARN
+        (t/warn ::non-conforming-transfer-transaction
                :problem (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft)))))
       conform)
     ;; Finally normal ones
@@ -89,8 +86,7 @@
           conform (s/conform ::spec/transaction ft)]
       (swap! dedup-struct conj (:code transaction))
       (when (s/invalid? conform)
-        (m/log ::non-conforming-standard-transaction
-               :level :WARN
+        (t/warn ::non-conforming-standard-transaction
                :problem (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft)))))
       conform)))
 
@@ -113,14 +109,12 @@
           conform (s/conform ::spec/transaction openingtransaction)]
       (if (s/invalid? conform)
         (do
-          (m/log ::non-conforming-opening-balance-transaction
-                 :level :WARN
+          (t/warn ::non-conforming-opening-balance-transaction
                  :data openingtransaction
                  :problem (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction openingtransaction))))
           conform)
         (do
-          (m/log ::opening-balance-transaction
-                 :level :INFO
+          (t/info ::opening-balance-transaction
                  :transaction openingtransaction)
           conform)))
         :clojure.spec.alpha/invalid))

@@ -2,7 +2,7 @@
   (:require [clojure.tools.cli :refer [parse-opts]]
             [clojure.string :as string]
             [clojure.java.io :as io]
-            [com.brunobonacci.mulog :as m]
+            [taoensso.timbre :as t]
             [akosiaris.myexpenses2hledger.logsetup :refer [setup-logging]]
             [akosiaris.myexpenses2hledger.importer :refer [load-my-expenses-json]]
             [akosiaris.myexpenses2hledger.outputter :refer [write-hledger-journal]])
@@ -71,7 +71,7 @@
 (defn hledgerize
   "Callable entry point to the application."
   [{:keys [input output equity-account]}]
-  (m/log ::parsing-input
+  (t/info ::parsing-input
          :level :INFO
          :file input)
   ;; Coerce to string as we might get a keyword when using -X:run-x

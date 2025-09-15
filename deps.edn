@@ -3,8 +3,7 @@
         org.clojure/tools.cli {:mvn/version "1.1.230"}
         org.clojure/data.json {:mvn/version "2.5.1"}
         clojure.java-time/clojure.java-time {:mvn/version "1.4.2"}
-        com.brunobonacci/mulog {:mvn/version "0.9.0"}
-        com.brunobonacci/mulog-adv-console {:mvn/version "0.9.0"}}
+        com.taoensso/timbre {:mvn/version "6.8.0"}}
  :aliases
  {:run-m {:main-opts ["-m" "akosiaris.myexpenses2hledger"]}
   :run-x {:ns-default akosiaris.myexpenses2hledger
