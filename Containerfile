@@ -2,7 +2,7 @@ FROM docker.io/clojure:temurin-21-tools-deps-bookworm AS build
 
 COPY . /app
 WORKDIR /app
-RUN clojure -T:build uberjar
+RUN clojure -T:build ci
 
 FROM docker.io/clojure:temurin-21-tools-deps-bookworm AS run
 
