@@ -18,6 +18,8 @@
    ;; Equity
    [nil "--equity-account EQUITY" "Equity account name. Defaults to 'equity:opening balances'"
     :default "equity:opening balances"]
+   ;; Whether transactions should be ordered from latest to oldest
+   ["-l" "--latest-first" "Transaction should be latest to oldest in the output"]
    ;; Logging scheme
    [nil "--ecs-logging" "Use Elastic Common Schema logging. Useful if structured logging is required"]
    ["-v" "--verbose" "Verbosity level. May be specific multiple times to increase level"
@@ -70,10 +72,8 @@
 
 (defn hledgerize
   "Callable entry point to the application."
-  [{:keys [input output equity-account]}]
-  (t/info ::parsing-input
-         :level :INFO
-         :file input)
+  [{:keys [input output equity-account latest-first]}]
+  (t/info ::parsing-file :input input :output output :equity-account equity-account)
   ;; Coerce to string as we might get a keyword when using -X:run-x
   (let [inp (str input)
         outp (str output)
@@ -81,12 +81,20 @@
     (if (.isDirectory (io/file inp))
       ;; We are working with a directory, we need to walk it. We don't support recursive though, on purpose
       (let [jfs (-> inp io/file .listFiles)
-            transactions (mapcat #(-> % slurp (load-my-expenses-json equity)) jfs)]
-        (write-hledger-journal transactions outp))
+            transactions (mapcat #(-> % slurp (load-my-expenses-json equity)) jfs)
+            sorted-transactions (sort-by #(:date %) transactions)
+            final-transactions (if latest-first
+                                 (reverse sorted-transactions)
+                                 sorted-transactions)]
+        (write-hledger-journal final-transactions outp))
       ;; Otherwise it's either a single account or a merged account file, treatment is
       ;; abstracted by called function
-      (let [transactions (-> inp slurp (load-my-expenses-json equity))]
-        (write-hledger-journal transactions outp)))))
+      (let [transactions (-> inp slurp (load-my-expenses-json equity))
+            sorted-transactions (sort-by #(:date %) transactions)
+            final-transactions (if latest-first
+                                 (reverse sorted-transactions)
+                                 sorted-transactions)]
+        (write-hledger-journal final-transactions outp)))))
 
 (defn -main
   "Main function"
