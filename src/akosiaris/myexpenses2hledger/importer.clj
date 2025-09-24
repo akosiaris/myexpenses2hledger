@@ -45,7 +45,8 @@
     ;; First off, let's avoid duplicates, by checking MyExpenses UUIDs and only including them once
     (contains? @dedup-struct (:code transaction))
     (do (t/info ::duplicate-transaction
-               :code (:code transaction))
+                :code (:code transaction)
+                :transferAccount (:transferAccount transaction))
         :clojure.spec.alpha/invalid)
 
     ;; Let's handles splits. We calculate all the splits, add the balancing transcation and flatten
@@ -58,10 +59,10 @@
           t (select-keys transaction [:date :payee :status :code :comment :tags :note])
           ft (assoc t :postings postings)
           conform (s/conform ::spec/transaction ft)]
-      (swap! dedup-struct conj (:code transaction))
-      (when (s/invalid? conform)
+      (if (s/invalid? conform)
         (t/warn ::non-conforming-split-transaction
-               :problem (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft)))))
+                :problem (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft))))
+        (swap! dedup-struct conj (:code transaction)))
       conform)
     ;; Then transfers. Those have the payee set to the empty string and we know the accounts of both postings
     (some? (:transferAccount transaction))
@@ -71,10 +72,10 @@
           t (assoc (select-keys transaction [:date :payee :status :code :comment :tags :note]) :payee "")
           ft (assoc t :postings [p1 p2])
           conform (s/conform ::spec/transaction ft)]
-      (swap! dedup-struct conj (:code transaction))
-      (when (s/invalid? conform)
+      (if (s/invalid? conform)
         (t/warn ::non-conforming-transfer-transaction
-               :problem (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft)))))
+                :problem (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft))))
+        (swap! dedup-struct conj (:code transaction)))
       conform)
     ;; Finally normal ones
     :else
@@ -84,10 +85,10 @@
           t (select-keys transaction [:date :payee :status :code :comment :tags :note])
           ft (assoc t :postings [p1 p2])
           conform (s/conform ::spec/transaction ft)]
-      (swap! dedup-struct conj (:code transaction))
-      (when (s/invalid? conform)
+      (if (s/invalid? conform)
         (t/warn ::non-conforming-standard-transaction
-               :problem (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft)))))
+                :problem (first (:clojure.spec.alpha/problems (s/explain-data ::spec/transaction ft))))
+        (swap! dedup-struct conj (:code transaction)))
       conform)))
 
 (defn- create-opening-balance-transaction
