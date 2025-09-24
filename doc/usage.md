@@ -25,7 +25,7 @@ $ java -jar myexpenses2hledger-0.1.0-standalone.jar --input <path_to_input> --ou
 And finally, if you got neither but have/prefer Docker/Podman, assuming your export is in the local directory
 
 ```bash
-$ docker run -v `pwd`:/data -it docker.io/akosiaris/myexpenses2hledger -i /data/export.json -o /data/foo.journal
+$ docker run -v `pwd`:/data -it ghcr.io/akosiaris/myexpenses2hledger -i /data/export.json -o /data/foo.journal
 ```
 
 where input is either of the ones below:

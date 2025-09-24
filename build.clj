@@ -4,7 +4,7 @@
             [deps-deploy.deps-deploy :as d]))
 
 (def lib 'net.clojars.akosiaris/myexpenses2hledger)
-(def version "0.3.0")
+(def version "0.4.0")
 (def main 'akosiaris.myexpenses2hledger)
 (def class-dir "target/classes")
 (def uber-file (format "target/%s-%s-standalone.jar" lib version))
